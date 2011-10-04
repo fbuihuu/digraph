@@ -1,0 +1,10 @@
+A simple module for implementing and operating on directed graph.
+
+It currently supports only a very small set of operations:
+
+   - topological sorting
+   - graph condensation
+   - transpose of graph
+
+It also allows to dump the graph structure into the dot language
+implemented by graphviz.

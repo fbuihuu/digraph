@@ -1,0 +1,24 @@
+a -> b
+b -> f
+b -> e
+b -> c
+e -> a
+e -> f
+
+c -> d
+c -> g
+d -> c
+d -> h
+
+f -> g
+g -> f
+g -> h
+g -> j
+
+h -> h
+
+i
+j
+
+x -> y
+y -> x
