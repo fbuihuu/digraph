@@ -96,8 +96,7 @@ def condensate(graph):
     mapping = {}
     for leader, group in groups:
         if len(group) > 1:
-            fmt = "Group '%s'"
-            leader = DirectedGraph(fmt % leader)
+            leader = DirectedGraph("Group(%s - %d)" % (leader, len(group)))
         for node in group:
             mapping[node] = leader
 
