@@ -191,18 +191,23 @@ if __name__ == "__main__":
     #exit()
 
     condensation = condensate(digraph)
-    graphviz_dot_digraph(condensation)
-    exit()
+    #graphviz_dot_digraph(condensation)
+    #exit()
 
-    #print "Connected components:"
-    #print "--------------------"
-    #for k,v in condensation.iteritems():
-    #    print "%s : %s" % (k, map(str, k.vertices))
-
-    #print "Connected Component Graph:"
-    #print "-------------------------"
+    #print "Condensation vertices:"
+    #print "---------------------"
     #for k,v in condensation.iteritems():
     #    print "%s : %s" % (k, map(str, v))
+
+    print "Connected components:"
+    print "--------------------"
+    for node in condensation.nodes():
+        if isinstance(node, DirectedGraph):
+            nodes = node.nodes()
+            if len(nodes) > 10:
+                nodes = nodes[:10] + ["..."]
+            print "* %s: %s" % (node, ', '.join(nodes))
+            #graphviz_dot_digraph(node)
 
     #print "Topological order:"
     #print "-----------------"
