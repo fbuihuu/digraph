@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import sys
 
-__all__ = ["DirectedGraph", "transpose", "condensate", "graphviz_dot_digraph"]
+__all__ = ["DirectedGraph", "transpose", "condensate", "dot"]
 
 # Directed graph built out of sets and dictionaries.
 class DirectedGraph(object):
@@ -114,7 +114,7 @@ def condensate(graph):
     return condensation
 
 
-def graphviz_dot_digraph(graph, expand=False, concentrate=False):
+def dot(graph, expand=False, concentrate=False):
     clusters = {}
 
     print 'digraph "%s" {' % str(graph)
@@ -186,11 +186,11 @@ def main(argv):
             return 1
 
     #import pdb; pdb.set_trace()
-    #graphviz_dot_digraph(digraph)
+    #dot(digraph)
     #exit()
 
     condensation = condensate(digraph)
-    #graphviz_dot_digraph(condensation)
+    #dot(condensation)
     #exit()
 
     #print "Condensation vertices:"
@@ -206,7 +206,7 @@ def main(argv):
             if len(nodes) > 10:
                 nodes = nodes[:10] + ["..."]
             print "* %s: %s" % (node, ', '.join(nodes))
-            #graphviz_dot_digraph(node)
+            #dot(node)
 
     #print "Topological order:"
     #print "-----------------"
