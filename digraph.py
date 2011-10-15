@@ -155,7 +155,7 @@ def graphviz_dot_digraph(graph, expand=False, concentrate=False):
     print '}'
 
 
-if __name__ == "__main__":
+def main(argv):
     lineno = 0
 
     digraph = DirectedGraph("digraph")
@@ -180,10 +180,10 @@ if __name__ == "__main__":
                 digraph.add_arc(words[0], words[2])
             else:
                 sys.stderr.write("Unknown symbol at line %d\n" % lineno)
-                exit
+                return 1
         else:
             sys.stderr.write("Incorrect syntax at line %d\n" % lineno)
-            exit
+            return 1
 
     #import pdb; pdb.set_trace()
     #graphviz_dot_digraph(digraph)
@@ -211,3 +211,9 @@ if __name__ == "__main__":
     #print "Topological order:"
     #print "-----------------"
     #print ' -> '.join(map(str, condensation.topological_iter()))
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
