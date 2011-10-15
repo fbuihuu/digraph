@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import sys
 
-__all__ = ["DirectedGraph", "transpose", "condensate", "dot"]
+__all__ = ["DirectedGraph", "transpose", "condensate", "dot", "open"]
 
 # Directed graph built out of sets and dictionaries.
 class DirectedGraph(object):
@@ -155,35 +155,46 @@ def dot(graph, expand=False, concentrate=False):
     print '}'
 
 
-def main(argv):
-    lineno = 0
+def open(filename, name=None):
+    import __builtin__, os
 
-    digraph = DirectedGraph("digraph")
+    if name is None:
+        name = os.path.basename(filename)
 
-    f = sys.stdin
-    for line in f.readlines():
-        if not line:
-            break
-        lineno = lineno + 1
-        line = line.strip()
-        # comments or blank lines
-        if line == '' or line[0] in '#':
-            continue
-        words = line.split()
-        # A single wors means add a single node to the graph.
-        # Additional vertices from this node can be added later.
-        if len(words) == 1:
-            digraph.add_node(line)
-        elif len(words) == 3:
-            # for now only '->' sign is known
-            if words[1] == "->":
-                digraph.add_arc(words[0], words[2])
+    with __builtin__.open(filename, 'r') as file:
+        digraph = DirectedGraph(name)
+        lineno = 0
+        for line in file:
+            if not line:
+                break
+            lineno = lineno + 1
+            line = line.strip()
+            # comments or blank lines
+            if line == '' or line[0] in '#':
+                continue
+            words = line.split()
+            # A single wors means add a single node to the graph.
+            # Additional vertices from this node can be added later.
+            if len(words) == 1:
+                digraph.add_node(line)
+            elif len(words) == 3:
+                # for now only '->' sign is known
+                if words[1] == "->":
+                    digraph.add_arc(words[0], words[2])
+                else:
+                    raise ValueError("Illegal symbol at line %d\n" % lineno)
             else:
-                sys.stderr.write("Unknown symbol at line %d\n" % lineno)
-                return 1
-        else:
-            sys.stderr.write("Incorrect syntax at line %d\n" % lineno)
-            return 1
+                raise ValueError("Incorrect syntax at line %d\n" % lineno)
+
+    return digraph
+
+def main(argc, argv):
+
+    if argc != 2:
+        sys.stderr.write("Usage: digraph.py <file>\n")
+        exit(1)
+
+    digraph = open(argv[1])
 
     #import pdb; pdb.set_trace()
     #dot(digraph)
@@ -216,4 +227,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main(len(sys.argv), sys.argv))
