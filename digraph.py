@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-import sys
+import sys, __builtin__
 
 __all__ = ["DirectedGraph", "transpose", "condensate", "dot", "open"]
 
@@ -113,23 +113,22 @@ def condensate(graph):
 
     return condensation
 
-
-def dot(graph, expand=False, concentrate=False):
+def __dot(graph, stream, expand, concentrate):
     clusters = {}
 
-    print 'digraph "%s" {' % str(graph)
-    print '  compound=%s;' % ("true" if expand else "false")
-    print '  concentrate=%s;' % ("true" if concentrate else "false")
+    print >>stream, 'digraph "%s" {' % str(graph)
+    print >>stream, '  compound=%s;' % ("true" if expand else "false")
+    print >>stream, '  concentrate=%s;' % ("true" if concentrate else "false")
     for node in graph:
         if isinstance(node, DirectedGraph) and expand:
             subgraph = node
             name = 'cluster%d' % len(clusters)
-            print '  subgraph %s {' % name
-            print '    label="%s" ' % str(subgraph)
+            print >>stream, '  subgraph %s {' % name
+            print >>stream, '    label="%s" ' % str(subgraph)
             for subnode in subgraph:
                 for subnext in subgraph[subnode]:
-                    print '    "%s" -> "%s";' % (subnode, subnext)
-            print '  }'
+                    print >>stream, '    "%s" -> "%s";' % (subnode, subnext)
+            print >>stream, '  }'
             # pickup a random node inside the cluster so we can use it
             # later to draw arcs to/from this cluster.
             clusters[subgraph] = (name, subnext)
@@ -139,26 +138,31 @@ def dot(graph, expand=False, concentrate=False):
     for src in graph:
         src_cluster, src_node = clusters[src]
         if len(graph[src]) == 0:
-            print '  "%s";' % src_node
+            print >>stream, '  "%s";' % src_node
         for dst in graph[src]:
             dst_cluster, dst_node = clusters[dst]
-
             if src_cluster is not None and dst_cluster is not None:
-                trailer = ' [ltail=%s,lhead=%s];' % (src_cluster, dst_cluster)
+                trailer = ' [ltail=%s,lhead=%s]' % (src_cluster, dst_cluster)
             elif src_cluster is not None:
-                trailer = ' [ltail=%s];' % src_cluster
+                trailer = ' [ltail=%s]' % src_cluster
             elif dst_cluster is not None:
-                trailer = ' [lhead=%s];' % dst_cluster
+                trailer = ' [lhead=%s]' % dst_cluster
             else:
-                trailer = ';'
-            print '  "%s" -> "%s"' % (src_node, dst_node) + trailer
-    print '}'
+                trailer = ''
+            print >>stream, '  "%s" -> "%s"' % (src_node, dst_node) + trailer + ';'
+    print >>stream, '}'
 
+def dot(graph, filename=None, expand=False, concentrate=False):
+    if filename is None:
+        __dot(graph, None, expand, concentrate)
+    else:
+        with __builtin__.open(filename, 'w') as stream:
+            __dot(graph, stream, expand, concentrate)
 
 def open(filename, name=None):
-    import __builtin__, os
 
     if name is None:
+        import os
         name = os.path.basename(filename)
 
     with __builtin__.open(filename, 'r') as file:
@@ -187,6 +191,7 @@ def open(filename, name=None):
                 raise ValueError("Incorrect syntax at line %d\n" % lineno)
 
     return digraph
+
 
 def main(argc, argv):
 
